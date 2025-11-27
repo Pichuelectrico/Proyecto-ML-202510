@@ -12,7 +12,9 @@ async def main():
     set_default_openai_key(os.getenv("OPENAI_API_KEY"))
 
     print("🚀 Agente autónomo iniciado...\n")
-    objetivo = input("🎯 Objetivo del agente: ")
+    # objetivo = input("🎯 Objetivo del agente: ")
+    objetivo = "Descarga el boletín financiero y valores de riesgos más recientes de todo el Segmento 1 de cooperativas en Ecuador."
+    print(f"🎯 Objetivo: {objetivo}")
 
     result = await Runner.run(
         starting_agent=scraper,

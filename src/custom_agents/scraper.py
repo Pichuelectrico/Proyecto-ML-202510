@@ -20,6 +20,7 @@ from tools.browser.download import (
 )
 from tools.utils.http import inspect_download_url
 from tools.utils.datetime import get_current_date
+from tools.utils.file_logging import save_download_summary
 
 
 scraper = Agent(
@@ -70,14 +71,18 @@ Siempre que el objetivo mencione "más reciente", "último", "actual" o similar:
   - Inspeccionar variables del sitio
 
 6) DESCARGA
-- Usa download_file() SOLO cuando el enlace sea directo.
-- Si el enlace de descarga contiene parámetros (por ejemplo ?download_id=, ?smd_process_download=, etc.)
-  primero llama a inspect_download_url() para ver:
+- Antes de descargar cualquier archivo, inspecciona el enlace con inspect_download_url() para verificar que tipo de archivo es con los datos que te da:
   - content_type
   - filename
   - extension
+- Usa download_file() SOLO cuando el enlace sea directo.
 - Si esperas un ZIP/XLSX/CSV y la inspección indica PDF o HTML, descarta esa URL y sigue buscando otra.
 - En enlaces dinámicos que dependen de un botón en la interfaz, prefiere browser_download_from_click().
+
+7) DOCUMENTACIÓN
+- Una vez hayas descargado TODOS los archivos necesarios, DEBES ejecutar save_download_summary().
+- Pasa una lista con el nombre de archivo (ej: "balance_2023.pdf") y una descripción clara de su contenido.
+- Esto es OBLIGATORIO antes de terminar.
 
 REGLAS CRÍTICAS:
 - Nunca inventes URLs.
@@ -116,6 +121,7 @@ CUANDO completes correctamente el objetivo, responde SOLO:
 
 		# Utilidades
 		get_current_date,
+		save_download_summary,
 	],
 	model_settings=ModelSettings(
 		temperature=0.15,
