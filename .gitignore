@@ -13,9 +13,6 @@ env/
 .env
 .env.*
 
-# Local notes
-notes.txt
-
 # Tool caches
 .pytest_cache/
 .mypy_cache/
@@ -44,3 +41,11 @@ wheels/
 
 # Playwright (optional cache)
 playwright/.cache/
+
+
+# Notes
+notes/
+
+# Data
+data/raw/
+data/preprocessed/
