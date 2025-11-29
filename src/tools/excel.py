@@ -1,9 +1,13 @@
 import pandas as pd
 import os
 import csv
+import warnings
 from typing import List, Any, Union
 from agents import function_tool
 from tools.shared import log
+
+# Suppress specific warnings from openpyxl
+warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
 
 @function_tool
 def get_excel_sheet_names(file_path: str) -> List[str]:

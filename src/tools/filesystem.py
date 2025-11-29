@@ -73,6 +73,11 @@ def unzip_file(zip_path: str, extract_to: str) -> str:
     """
     log(f"📦 Unzipping {zip_path} to {extract_to}")
     try:
+        # Check if the directory already exists and is not empty
+        if os.path.exists(extract_to) and os.listdir(extract_to):
+            log(f"Directory {extract_to} already exists and is not empty. Skipping unzip.")
+            return f"Directory {extract_to} already exists and is not empty. Skipping unzip."
+
         os.makedirs(extract_to, exist_ok=True)
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(extract_to)
