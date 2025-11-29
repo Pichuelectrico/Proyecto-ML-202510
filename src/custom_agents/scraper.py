@@ -88,7 +88,7 @@ Siempre que el objetivo mencione "más reciente", "último", "actual" o similar:
 
 7) DOCUMENTACIÓN
 - Una vez hayas descargado TODOS los archivos necesarios, DEBES ejecutar save_download_summary().
-- Pasa una lista con el nombre de archivo (ej: "balance_2023.pdf") y una descripción clara de su contenido.
+- Pasa una lista con el nombre de archivo (ej: "balance_2023.pdf") y una descripción clara de su contenido donde especifiques si especificamente tiene los datos del Segmento requerido o si está el segmento requerido y otros Segmentos también.
 - Esto es OBLIGATORIO antes de terminar.
 
 REGLAS CRÍTICAS:
