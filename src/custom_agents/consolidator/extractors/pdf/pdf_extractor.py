@@ -1,6 +1,6 @@
 import os
 from agents import Agent, Runner, function_tool
-from tools.shared import report_agent_start
+from tools.shared import report_agent_start, print_header
 from tools.shared import log
 from tools.formats.pdf import (
     extract_text_from_pdf,
@@ -10,12 +10,13 @@ from tools.formats.pdf import (
 )
 from custom_agents.consolidator.extractors.pdf.pdf_cleaner import pdf_cleaner
 
+NAME = "Pdf Extractor"
+
 pdf_extractor = Agent(
-    name="Pdf Extractor",
+    name=NAME,
     model="gpt-5",
-    instructions="""
+    instructions=f"""
     Eres un agente experto en extracción de datos de documentos PDF.
-    PRIMERO: Llama a `report_agent_start` con tu nombre y una descripción corta.
     Tu tarea es recibir un archivo PDF, encontrar la tabla de datos financieros o de riesgo de cooperativas, y extraerla COMPLETAMENTE (si esta separada en paginas juntala, pero tienes que extraer TODA la tabla) y EXACTAMENTE como está.
     Asegurate que cada celda caudre con el lugar de la tabla en el que estaba en el pdf, no deberia haber celdas sin datos (pero NO te puedes inventar ninguno), ni deben haber datos en lugares en donde no hay headers por ejemplo (tipo fuera de la estructura principal de la tabla).
     Si se trata de una valoracion de riesgos asegurate de obtener todos los valores de riesgos y exactamente donde deberian estar en la tabla.
@@ -36,7 +37,6 @@ pdf_extractor = Agent(
     El usuario te proporcionará el nombre del archivo de salida y opcionalmente el `target_segment` en el prompt.
     """,
     tools=[
-        report_agent_start,
         save_csv_from_pdf, 
         extract_text_from_pdf, 
         update_csv_with_correction,
@@ -58,6 +58,7 @@ async def process_pdf(file_path: str, output_filename: str, target_segment: str 
         output_filename: Nombre del archivo CSV de salida (ej: 'riesgo_junio_2025.csv').
         target_segment: (Opcional) Segmento específico a filtrar (ej: "1").
     """
+    print_header(title=f"[5/7] {NAME}", description="Extracción de tablas de PDF")
     log(f"📄 Procesando PDF: {file_path} (Segmento: {target_segment})")
     
     if not os.path.exists(file_path):
@@ -96,9 +97,7 @@ async def process_pdf(file_path: str, output_filename: str, target_segment: str 
             input=messages,
             max_turns=15
         )
-        
-        print(f"Procesamiento de PDF completado. Resultado: {result.final_output}")
-        
+                
         return f"Procesamiento de PDF completado. Resultado: {result.final_output}"
         
     except Exception as e:

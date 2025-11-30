@@ -24,11 +24,12 @@ from tools.utils.datetime import get_current_date
 from tools.utils.file_logging import save_download_summary
 from tools.utils.filesystem import clear_directories
 
+NAME = "Scraper"
 
 scraper = Agent(
-	name="Scraper",
+	name=NAME,
 	model="gpt-4.1",
-	instructions="""
+	instructions=f"""
 Eres un agente experto en inteligencia financiera y web scraping enfocado en el sector de la Economía Popular y Solidaria de Ecuador.
 Tu OBJETIVO PRINCIPAL es localizar y descargar los "Boletines Financieros" y los "Valores de Riesgo" de TODAS las Cooperativas del Ecuador.
 
@@ -47,7 +48,7 @@ HERRAMIENTAS Y CAPACIDADES:
 FLUJO DE TRABAJO OBLIGATORIO (NO TE PUEDES SALTAR PASOS):
 
 0) PREPARACIÓN
-- Llama primero a `report_agent_start` pasando: nombre del agente y una descripción corta.
+- Llama primero a `report_agent_start` pasando: title="[1/7] {NAME}" y una descripción corta.
 Siempre que el objetivo mencione "más reciente", "último", "actual" o similar:
   - Llama primero a get_current_date().
   - Guarda mentalmente la fecha actual para poder saber qué es lo más reciente.

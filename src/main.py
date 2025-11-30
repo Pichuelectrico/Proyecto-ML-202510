@@ -15,7 +15,7 @@ async def main():
     objetivo = "Segmento 1, fecha más reciente"
     print(f"🎯 Objetivo: {objetivo}")
 
-    skip_scraper = False
+    skip_scraper = True
 
     if not skip_scraper:
         result_scraper = await Runner.run(
@@ -23,7 +23,6 @@ async def main():
             input=objetivo,
             max_turns=40,
         )
-        print(f"🏁 Resultado Scraper: {result_scraper.final_output}")
 
         await close_browser()
     else:
@@ -34,8 +33,6 @@ async def main():
         input=f"Objetivo original: {objetivo}. Por favor consolida la información descargada.",
         max_turns=40,
     )
-    print(f"🏁 Resultado Consolidator: {result_consolidator.final_output}")
-
 
 
 if __name__ == "__main__":

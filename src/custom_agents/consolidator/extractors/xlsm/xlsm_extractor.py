@@ -5,12 +5,14 @@ from tools.formats.excel import get_excel_sheet_names, read_excel_range, extract
 from custom_agents.consolidator.extractors.xlsm.xlsm_cleaner import xlsm_cleaner
 from tools.transform.merger import merge_and_clean_csvs
 
+NAME = "Xlsm Extractor"
+
 xlsm_extractor = Agent(
-    name="Xlsm Extractor",
+    name=NAME,
     model="gpt-5",
-    instructions="""
+    instructions=f"""
 Eres un agente experto en extracción de datos financieros de archivos Excel (.xlsm).
-PRIMERO: Llama a `report_agent_start` con tu nombre y una descripción corta.
+PRIMERO: Llama a `report_agent_start` con title="[3/7] {NAME}" y una descripción corta.
 
 Tu objetivo es extraer exclusivamente **ratios financieros relevantes**, no montos brutos, no subtotales, no duplicados, y producir un dataset limpio y estandarizado.
 
@@ -90,6 +92,12 @@ TU MISION:
 
      c) Solo cuando termines con la hoja actual, pasa a la siguiente.
 
+⚠️ CRITICO SOBRE LA EXTRACCIÓN:
+- La data de un indicador SIEMPRE está en la MISMA FILA que su nombre.
+- Si encuentras "Morosidad" en la fila 10, los datos ESTÁN en la fila 10.
+- NO asumas que los datos están en la fila siguiente.
+- NO sumes 1 al índice de la fila. Usa el índice EXACTO donde encontraste el nombre.
+- Si el valor en Excel es un porcentaje (ej: 87.5%), extrae el valor numérico decimal (0.875). Esto es CORRECTO para Machine Learning. No lo multipliques por 100.
 
 4. LIMPIEZA FINAL (OBLIGATORIO):
    - Una vez hayas procesado TODAS las hojas y generado los CSVs, DEBES llamar al agente `clean_csvs`.

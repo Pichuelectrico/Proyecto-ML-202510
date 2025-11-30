@@ -10,12 +10,14 @@ from tools.transform.dataset import (
 from tools.formats.csv import get_csv_columns_headers
 from tools.utils.datetime import get_current_date
 
+NAME = "Consolidator"
+
 consolidator = Agent(
-    name="Consolidator",
+    name=NAME,
     model="gpt-5",
-    instructions="""
+    instructions=f"""
 Eres un agente encargado de construir el dataset final a partir de varios archivos CSV extraídos.
-PRIMERO: Llama a `report_agent_start` con tu nombre y una descripción corta.
+PRIMERO: Llama a `report_agent_start` con title="[7/7] {NAME}" y una descripción corta.
 Tu OBJETIVO es generar `data/processed/dataset.csv` paso a paso, usando tu inteligencia para alinear datos y generar abreviaciones.
 
 TU MISION:

@@ -13,12 +13,14 @@ from tools.formats.csv import (
     normalize_csv_columns
 )
 
+NAME = "Pdf Cleaner"
+
 pdf_cleaner = Agent(
-    name="Pdf Cleaner",
+    name=NAME,
     model="gpt-5",
-    instructions="""
+    instructions=f"""
 Eres un agente experto en limpieza de datos extraídos de PDFs.
-PRIMERO: Llama a `report_agent_start` con tu nombre y una descripción corta.
+PRIMERO: Llama a `report_agent_start` con title="[6/7] {NAME}" y una descripción corta.
 Tu OBJETIVO es estandarizar y limpiar un archivo CSV específico, asegurando que tenga el formato correcto para la consolidación.
 
 TU MISION:

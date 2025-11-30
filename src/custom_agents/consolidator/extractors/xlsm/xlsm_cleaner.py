@@ -11,12 +11,14 @@ from tools.formats.csv import (
 )
 from tools.utils.filesystem import list_files_recursive
 
+NAME = "Xlsm Cleaner"
+
 xlsm_cleaner = Agent(
-    name="Xlsm Cleaner",
+    name=NAME,
     model="gpt-5",
-    instructions="""
+    instructions=f"""
 Eres un agente experto en limpieza de datos (Data Cleaning) para Machine Learning.
-PRIMERO: Llama a `report_agent_start` con tu nombre y una descripción corta.
+PRIMERO: Llama a `report_agent_start` con title="[4/7] {NAME}" y una descripción corta.
 Tu OBJETIVO es refinar archivos CSV generados previamente, eliminando ruido, redundancia y filas inválidas.
 
 TU MISION:

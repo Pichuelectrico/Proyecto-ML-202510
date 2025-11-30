@@ -6,10 +6,12 @@ from custom_agents.consolidator.extractors.xlsm.xlsm_extractor import xlsm_extra
 from custom_agents.consolidator.extractors.pdf.pdf_extractor import process_pdf
 from custom_agents.consolidator.consolidator import consolidator
 
+NAME = "Consolidator Orchestrator"
+
 consolidatorOrchestrator = Agent(
-    name="Consolidator Orchestrator",
+    name=NAME,
     model="gpt-4.1",
-    instructions="""
+    instructions=f"""
 Eres un agente ORQUESTADOR encargado de consolidar información financiera de cooperativas.
 Tu objetivo es preparar un dataset final a partir de archivos descargados (raw data).
 
@@ -17,7 +19,7 @@ Tu objetivo es preparar un dataset final a partir de archivos descargados (raw d
 
 TUS RESPONSABILIDADES:
 0. REPORTAR INICIO (OBLIGATORIO):
-    - Llama primero a `report_agent_start` pasando: nombre del agente y una descripción corta (menos de 80 caracteres).
+    - Llama primero a `report_agent_start` pasando: title="[2/7] {NAME}" y una descripción corta (menos de 80 caracteres).
     - Luego continúa.
 1. LIMPIEZA INICIAL (CRÍTICO):
    - Antes de hacer nada, EJECUTA `clear_directories` pasando la lista `['data/preprocessed/', 'data/processed/']` para asegurar un entorno limpio y evitar mezclar datos antiguos.
