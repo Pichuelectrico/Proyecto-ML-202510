@@ -75,20 +75,20 @@ TU MISION:
         - Si no encuentras estructura válida, descarta la hoja.
 
      b) EXTRACCIÓN INCREMENTAL DE FEATURES:
-        - Define el archivo temporal para esta hoja: `data/preprocessed/temp/[nombre_hoja].csv`.
+        - Define el archivo temporal para esta hoja: `data/preprocessed/temp/{{nombre_hoja}}.csv`.
         - Itera leyendo batches de filas hacia abajo (ej: de 200 en 200) desde `fila_inicial` en la `columna_inicial`.
         - En cada batch:
           1. Identifica los índices de las filas que contienen features RELEVANTES según los criterios arriba.
-          2. Si encuentras filas relevantes, llama a `extract_features_to_csv`:
+          2. Si encuentras filas relevantes, llama a `extract_features_to_csv` (siempre con el mismo nombre de archivo temporal `data/preprocessed/temp/{{nombre_hoja}}.csv`):
              - `feature_row_indices`: Lista de índices encontrados en este batch.
              - `header_row_index`: La `fila_inicial` detectada en el paso (a).
              - `start_col`: La `columna_inicial`.
-             - `end_col`: The `columna_fin`.
-             - `output_csv_path`: The temporary file for this sheet.
-             - `feature_name_map_json`: String JSON `{{"indice_fila": "nuevo_nombre_snake_case" }}` to rename features.
-               - USE IT to standardize names (e.g., "Patrimonio / Activos" -> "patrimonio_sobre_activos").
-               - If you don't use it, a basic automatic normalization will be applied.
-          3. Stop if you find end-of-table indicators (Totals, notes, consecutive empties).
+             - `end_col`: La `columna_fin`.
+             - `output_csv_path`: El archivo temporal de esta hoja.
+             - `feature_name_map_json`: String JSON `{{"indice_fila": "nuevo_nombre_snake_case" }}` para renombrar features.
+               - ÚSALO para estandarizar nombres (ej: "Patrimonio / Activos" -> "patrimonio_sobre_activos").
+               - Si no lo usas, se aplicará una normalización automática básica.
+          3. Detente si encuentras indicadores de fin de tabla (Totales, notas, vacíos consecutivos).
 
      c) Solo cuando termines con la hoja actual, pasa a la siguiente.
 
