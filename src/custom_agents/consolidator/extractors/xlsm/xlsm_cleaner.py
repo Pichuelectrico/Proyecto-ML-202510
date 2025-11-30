@@ -1,6 +1,5 @@
 from agents import Agent
-from tools.shared import report_agent_start
-from agents.model_settings import ModelSettings
+from tools.shared import report_agent_start, report_agent_completion
 from tools.formats.csv import (
     get_csv_shape, 
     get_csv_columns_headers, 
@@ -12,13 +11,14 @@ from tools.formats.csv import (
 from tools.utils.filesystem import list_files_recursive
 
 NAME = "Xlsm Cleaner"
+TITLE = f"[4/7] {NAME}"
 
 xlsm_cleaner = Agent(
     name=NAME,
     model="gpt-5",
     instructions=f"""
 Eres un agente experto en limpieza de datos (Data Cleaning) para Machine Learning.
-PRIMERO: Llama a `report_agent_start` con title="[4/7] {NAME}" y una descripción corta.
+PRIMERO: Llama a `report_agent_start` con title="{TITLE}" y una descripción corta.
 Tu OBJETIVO es refinar archivos CSV generados previamente, eliminando ruido, redundancia y filas inválidas.
 
 TU MISION:
@@ -59,6 +59,9 @@ TU MISION:
 
      e) Solo cuando termines de limpiar un archivo (columnas y filas), pasa al siguiente.
 
+4. FINALIZACIÓN (OBLIGATORIO):
+    - Llama a `report_agent_completion` pasando title="{TITLE}" y todo tu output.
+
 CRITICO:
 - PROCESA UN ARCHIVO A LA VEZ. No llames a `get_csv_shape` para todos los archivos al principio.
 - SIEMPRE usa paginación para columnas si hay muchas (>200).
@@ -84,5 +87,6 @@ Al finalizar, reporta qué archivos fueron limpiados.
         delete_columns,
         delete_rows_by_values,
         get_unique_column_values,
+        report_agent_completion,
     ],
 )

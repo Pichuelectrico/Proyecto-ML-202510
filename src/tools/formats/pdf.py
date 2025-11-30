@@ -40,16 +40,11 @@ def update_csv_with_correction(content: str, output_filename: str) -> str:
     
     if not os.path.exists(output_path):
         return save_csv_from_pdf(content, output_filename)
-        
-    # Read old content for comparison
     with open(output_path, "r", encoding="utf-8-sig") as f:
         old_lines = f.readlines()
         
     new_lines = content.splitlines(keepends=True)
-    
-    # Simple diff count
     diff_count = 0
-    # Compare line by line (basic heuristic)
     min_len = min(len(old_lines), len(new_lines))
     for i in range(min_len):
         if old_lines[i].strip() != new_lines[i].strip():

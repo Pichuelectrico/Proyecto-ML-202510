@@ -10,6 +10,7 @@ from tools.browser.navigation import (
 	browser_wait,
 	browser_scroll,
 	browser_eval,
+    browser_close,
 )
 from tools.browser.extraction import (
 	browser_get_text,
@@ -23,8 +24,10 @@ from tools.utils.http import inspect_download_url
 from tools.utils.datetime import get_current_date
 from tools.utils.file_logging import save_download_summary
 from tools.utils.filesystem import clear_directories
+from tools.shared import report_agent_completion
 
 NAME = "Scraper"
+TITLE = f"[1/7] {NAME}"
 
 scraper = Agent(
 	name=NAME,
@@ -45,10 +48,10 @@ HERRAMIENTAS Y CAPACIDADES:
 - Ejecución directa de JavaScript
 - Descarga de archivos
 
-FLUJO DE TRABAJO OBLIGATORIO (NO TE PUEDES SALTAR PASOS):
+FLUJO DE TRABAJO OBLIGATORIO (NO TE PUEDES SALTAR PASOS, DEBES LLEGAR HASTA LA FINALIZACION):
 
 0) PREPARACIÓN
-- Llama primero a `report_agent_start` pasando: title="[1/7] {NAME}" y una descripción corta.
+- Llama primero a `report_agent_start` pasando: title="{TITLE}" y una descripción corta.
 Siempre que el objetivo mencione "más reciente", "último", "actual" o similar:
   - Llama primero a get_current_date().
   - Guarda mentalmente la fecha actual para poder saber qué es lo más reciente.
@@ -97,6 +100,10 @@ Siempre que el objetivo mencione "más reciente", "último", "actual" o similar:
 - Pasa una lista con el nombre de archivo (ej: "balance_2023.pdf") y una descripción clara de su contenido donde especifiques si especificamente tiene los datos del Segmento requerido o si está el segmento requerido y otros Segmentos también.
 - Esto es OBLIGATORIO antes de terminar.
 
+8) FINALIZACIÓN
+- Llama a `browser_close` para cerrar el navegador.
+- Llama a `report_agent_completion` pasando title="{TITLE}" y todo tu output.
+
 REGLAS CRÍTICAS:
 - Nunca inventes URLs.
 - Nunca inventes selectores.
@@ -123,9 +130,12 @@ REGLAS CRÍTICAS:
 		get_current_date,
 		save_download_summary,
         clear_directories,
+        browser_close,
+        report_agent_completion,
 	],
 	model_settings=ModelSettings(
 		temperature=0.15,
 		tool_choice="auto",
 	),
 )
+

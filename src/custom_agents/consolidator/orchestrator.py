@@ -5,8 +5,10 @@ from tools.utils.filesystem import list_files_recursive, read_json_file, unzip_f
 from custom_agents.consolidator.extractors.xlsm.xlsm_extractor import xlsm_extractor
 from custom_agents.consolidator.extractors.pdf.pdf_extractor import process_pdf
 from custom_agents.consolidator.consolidator import consolidator
+from tools.shared import report_agent_completion
 
 NAME = "Consolidator Orchestrator"
+TITLE = f"[2/7] {NAME}"
 
 consolidatorOrchestrator = Agent(
     name=NAME,
@@ -19,7 +21,7 @@ Tu objetivo es preparar un dataset final a partir de archivos descargados (raw d
 
 TUS RESPONSABILIDADES:
 0. REPORTAR INICIO (OBLIGATORIO):
-    - Llama primero a `report_agent_start` pasando: title="[2/7] {NAME}" y una descripción corta (menos de 80 caracteres).
+    - Llama primero a `report_agent_start` pasando: title="{TITLE}" y una descripción corta (menos de 80 caracteres).
     - Luego continúa.
 1. LIMPIEZA INICIAL (CRÍTICO):
    - Antes de hacer nada, EJECUTA `clear_directories` pasando la lista `['data/preprocessed/', 'data/processed/']` para asegurar un entorno limpio y evitar mezclar datos antiguos.
@@ -42,6 +44,9 @@ TUS RESPONSABILIDADES:
     - IMPORTANTE: Como tú defines los `output_filename` para los sub-agentes (paso 4), TÚ CONOCES las rutas exactas de los archivos generados.
     - Proporciónale la LISTA EXPLÍCITA de esas rutas a los CSVs a unir (ej: `['data/preprocessed/archivo1.csv', ...]`) y la ruta del CSV que contiene las valoraciones de riesgo.
     - Indícale también la FECHA requerida (la misma que recibiste en el objetivo).
+
+6. FINALIZACIÓN
+    - Llama a `report_agent_completion` pasando title="{TITLE}" y todo tu output.
 
 HERRAMIENTAS:
 - `clear_directories`: Para limpiar las carpetas de preprocesados y procesados al inicio.
@@ -72,9 +77,11 @@ NOTA:
             tool_description="Construye el dataset final a partir de los CSVs preprocesados y el CSV de riesgos.",
             max_turns=40,
         ),
+        report_agent_completion,
     ],
     model_settings=ModelSettings(
         temperature=0.1,
         tool_choice="auto",
     ),
 )
+

@@ -1,5 +1,5 @@
 from agents import Agent
-from tools.shared import report_agent_start
+from tools.shared import report_agent_start, report_agent_completion
 from tools.transform.dataset import (
     get_first_column,
     create_dataset,
@@ -11,13 +11,14 @@ from tools.formats.csv import get_csv_columns_headers
 from tools.utils.datetime import get_current_date
 
 NAME = "Consolidator"
+TITLE = f"[7/7] {NAME}"
 
 consolidator = Agent(
     name=NAME,
     model="gpt-5",
     instructions=f"""
 Eres un agente encargado de construir el dataset final a partir de varios archivos CSV extraídos.
-PRIMERO: Llama a `report_agent_start` con title="[7/7] {NAME}" y una descripción corta.
+PRIMERO: Llama a `report_agent_start` con title="{TITLE}" y una descripción corta.
 Tu OBJETIVO es generar `data/processed/dataset.csv` paso a paso, usando tu inteligencia para alinear datos y generar abreviaciones.
 
 TU MISION:
@@ -57,7 +58,8 @@ TU MISION:
      - Eliminar duplicados.
      - Normalizar features (StandardScaler), respetando las columnas 'cooperativa', 'abreviacion' y 'Label'.
 
-7. Finaliza reportando el éxito.
+7. FINALIZACIÓN (OBLIGATORIO):
+    - Llama a `report_agent_completion` pasando title="{TITLE}" y todo tu output.
 
 CRITICO:
 - El `index_mapping` debe tener la misma longitud que el número de filas del dataset final.
@@ -73,5 +75,6 @@ CRITICO:
         get_csv_columns_headers,
         get_current_date,
         finalize_and_clean_dataset,
+        report_agent_completion,
     ],
 )

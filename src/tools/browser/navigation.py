@@ -1,5 +1,5 @@
 from agents import function_tool
-from tools.browser.controller import init_browser
+from tools.browser.controller import init_browser, close_browser
 from tools.shared import log
 
 @function_tool
@@ -46,3 +46,10 @@ async def browser_eval(script: str):
     result = await page.evaluate(script)
     log("📤 Resultado de JavaScript obtenido")
     return result
+
+@function_tool
+async def browser_close():
+    """Cierra el navegador y libera recursos."""
+    log("🛑 Cerrando navegador...")
+    await close_browser()
+    return "Navegador cerrado correctamente."

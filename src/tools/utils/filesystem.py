@@ -1,7 +1,7 @@
 import os
 import json
 import zipfile
-from typing import List, Dict, Any
+from typing import List, Any
 from agents import function_tool
 from tools.shared import log
 
@@ -111,7 +111,6 @@ def unzip_file(zip_path: str, extract_to: str) -> str:
     """
     log(f"📦 Unzipping {zip_path} to {extract_to}")
     try:
-        # Check if the directory already exists and is not empty
         if os.path.exists(extract_to) and os.listdir(extract_to):
             log(f"Directory {extract_to} already exists and is not empty. Skipping unzip.")
             return f"Directory {extract_to} already exists and is not empty. Skipping unzip."

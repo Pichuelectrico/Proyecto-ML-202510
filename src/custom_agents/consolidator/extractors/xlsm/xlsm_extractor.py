@@ -1,22 +1,22 @@
 from agents import Agent
-from tools.shared import report_agent_start
-from agents.model_settings import ModelSettings
-from tools.formats.excel import get_excel_sheet_names, read_excel_range, extract_range_to_csv, extract_features_to_csv
+from tools.shared import report_agent_start, report_agent_completion
+from tools.formats.excel import get_excel_sheet_names, read_excel_range, extract_features_to_csv
 from custom_agents.consolidator.extractors.xlsm.xlsm_cleaner import xlsm_cleaner
 from tools.transform.merger import merge_and_clean_csvs
 
 NAME = "Xlsm Extractor"
+TITLE = f"[3/7] {NAME}"
 
 xlsm_extractor = Agent(
     name=NAME,
     model="gpt-5",
     instructions=f"""
 Eres un agente experto en extracción de datos financieros de archivos Excel (.xlsm).
-PRIMERO: Llama a `report_agent_start` con title="[3/7] {NAME}" y una descripción corta.
+PRIMERO: Llama a `report_agent_start` 1 vez, con title="{TITLE}" y una descripción corta.
 
 Tu objetivo es extraer exclusivamente **ratios financieros relevantes**, no montos brutos, no subtotales, no duplicados, y producir un dataset limpio y estandarizado.
 
-🏆 EXTRAER SOLO ESTOS TIPOS DE INDICADORES (máximo 30 por archivo):
+🏆 EXTRAER SOLO ESTOS TIPOS DE INDICADORES (máximo 20 por archivo) Y EN TOTAL SI HAY BUENOS INDICADORES TRATA DE QUE MINIMO SEAN 10 (piensa en escoguer los mejores y lo necesarios para ML, escogue de manera que cualquier otr experto hubiera escogido exactmaente las mismas):
 
 1️⃣ Riesgo de cartera (clave)
 - Morosidad total
@@ -61,7 +61,7 @@ Convierte los nombres a snake_case, por ejemplo:
 - “Morosidad General (%)” → “morosidad_general”
 - “Patrimonio/Activos” → “patrimonio_sobre_activos”
 
-TU MISION:
+TU MISIÓN, OBLIGATORIAMENTE HACERLA DE MANERA SECUENCIAL:
 1. Recibirás la ruta de un archivo .xlsm y el nombre del archivo de salida (`output_filename`).
 2. Obtén la lista de hojas con `get_excel_sheet_names`.
 3. PROCESAMIENTO SECUENCIAL (Hoja por Hoja):
@@ -76,7 +76,7 @@ TU MISION:
 
      b) EXTRACCIÓN INCREMENTAL DE FEATURES:
         - Define el archivo temporal para esta hoja: `data/preprocessed/temp/{{nombre_hoja}}.csv`.
-        - Itera leyendo batches de filas hacia abajo (ej: de 200 en 200) desde `fila_inicial` en la `columna_inicial`.
+        - Itera leyendo batches de filas hacia abajo (ej: de 200 en 200) desde `fila_inicial` en la `columna_inicial` hasta `columna_inicial + 1` para ver si el nombre de la fila (feature) es un titulo sin datos a la derecha o efectivamente es un feature con datos a la derecha.
         - En cada batch:
           1. Identifica los índices de las filas que contienen features RELEVANTES según los criterios arriba.
           2. Si encuentras filas relevantes, llama a `extract_features_to_csv` (siempre con el mismo nombre de archivo temporal `data/preprocessed/temp/{{nombre_hoja}}.csv`):
@@ -92,12 +92,12 @@ TU MISION:
 
      c) Solo cuando termines con la hoja actual, pasa a la siguiente.
 
-⚠️ CRITICO SOBRE LA EXTRACCIÓN:
-- La data de un indicador SIEMPRE está en la MISMA FILA que su nombre.
-- Si encuentras "Morosidad" en la fila 10, los datos ESTÁN en la fila 10.
-- NO asumas que los datos están en la fila siguiente.
-- NO sumes 1 al índice de la fila. Usa el índice EXACTO donde encontraste el nombre.
-- Si el valor en Excel es un porcentaje (ej: 87.5%), extrae el valor numérico decimal (0.875). Esto es CORRECTO para Machine Learning. No lo multipliques por 100.
+   ⚠️ CRITICO SOBRE LA EXTRACCIÓN:
+   - La data de un indicador SIEMPRE está en la MISMA FILA que su nombre.
+   - Si encuentras "Morosidad" en la fila 10, los datos ESTÁN en la fila 10.
+   - NO asumas que los datos están en la fila siguiente.
+   - NO sumes 1 al índice de la fila. Usa el índice EXACTO donde encontraste el nombre.
+   - Si el valor en Excel es un porcentaje (ej: 87.5%), extrae el valor numérico decimal (0.875). Esto es CORRECTO para Machine Learning. No lo multipliques por 100.
 
 4. LIMPIEZA FINAL (OBLIGATORIO):
    - Una vez hayas procesado TODAS las hojas y generado los CSVs, DEBES llamar al agente `clean_csvs`.
@@ -113,6 +113,9 @@ TU MISION:
      - output_folder: `data/preprocessed/`.
      - output_filename: El nombre del archivo de salida (`output_filename`) que se te proporcionó al inicio.
    - Esta herramienta unificará todos los CSVs en uno solo, usando la primera columna como llave primaria, y limpiará columnas vacías o constantes.
+
+6. FINALIZACIÓN (OBLIGATORIO):
+    - Llama a `report_agent_completion` pasando title="{TITLE}" y todo tu output.
 
 CRITICO:
 - NO extraigas toda la tabla. Solo las filas relevantes.
@@ -130,5 +133,6 @@ CRITICO:
             max_turns=40
         ),
         merge_and_clean_csvs,
+        report_agent_completion,
     ],
 )

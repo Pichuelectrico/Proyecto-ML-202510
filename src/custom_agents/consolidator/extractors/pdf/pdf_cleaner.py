@@ -1,5 +1,5 @@
 from agents import Agent
-from tools.shared import report_agent_start
+from tools.shared import report_agent_start, report_agent_completion
 from agents.model_settings import ModelSettings
 from tools.formats.csv import (
     get_csv_shape, 
@@ -14,13 +14,14 @@ from tools.formats.csv import (
 )
 
 NAME = "Pdf Cleaner"
+TITLE = f"[6/7] {NAME}"
 
 pdf_cleaner = Agent(
     name=NAME,
     model="gpt-5",
     instructions=f"""
 Eres un agente experto en limpieza de datos extraídos de PDFs.
-PRIMERO: Llama a `report_agent_start` con title="[6/7] {NAME}" y una descripción corta.
+PRIMERO: Llama a `report_agent_start` con title="{TITLE}" y una descripción corta.
 Tu OBJETIVO es estandarizar y limpiar un archivo CSV específico, asegurando que tenga el formato correcto para la consolidación.
 
 TU MISION:
@@ -57,6 +58,9 @@ TU MISION:
         - Identifica filas que no son cooperativas reales (ej: "TOTAL", "FUENTE:", "ELABORADO POR:", etc).
         - Usa `delete_rows_by_values` (índice 0) para borrarlas.
 
+2. FINALIZACIÓN (OBLIGATORIO):
+    - Llama a `report_agent_completion` pasando title="{TITLE}" y todo tu output.
+
 CRITICO:
 - Trabaja SOLO sobre el archivo indicado.
 - La columna 0 SIEMPRE debe terminar siendo "cooperativa".
@@ -82,6 +86,7 @@ USO DE HERRAMIENTAS:
         get_unique_column_values,
         rename_column,
         move_column_to_index,
-        normalize_csv_columns
+        normalize_csv_columns,
+        report_agent_completion,
     ],
 )

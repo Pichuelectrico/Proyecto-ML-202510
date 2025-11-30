@@ -1,5 +1,4 @@
 import pandas as pd
-import os
 from typing import List, Any
 from agents import function_tool
 from tools.shared import log
@@ -62,11 +61,8 @@ def read_csv_head(file_path: str, n_rows: int = 3) -> List[List[Any]]:
     log(f"👀 Reading headers and first {n_rows} rows from {file_path}")
     try:
         df = pd.read_csv(file_path, nrows=n_rows, encoding='utf-8-sig')
-        # Get headers
         headers = df.columns.tolist()
-        # Get values
         values = df.where(pd.notnull(df), None).values.tolist()
-        # Combine
         return [headers] + values
     except Exception as e:
         return [[f"Error reading CSV file: {str(e)}"]]
@@ -88,14 +84,8 @@ def get_csv_rows_headers(file_path: str, column_index: int = 0, offset: int = 0,
     end_idx = offset + limit
     log(f"🧐 Reading First Column (Rows {offset} to {end_idx}) from {file_path}")
     try:
-        # Read the full column (efficient enough for typical CSV sizes) and slice in memory
-        # This avoids complex skiprows logic with headers
         df = pd.read_csv(file_path, usecols=[column_index], encoding='utf-8-sig')
-        
-        # Slice the dataframe
         subset = df.iloc[offset : offset + limit, 0]
-        
-        # Return the values as a list, handling NaNs
         return subset.where(pd.notnull(subset), None).tolist()
     except Exception as e:
         return [f"Error reading column: {str(e)}"]
@@ -115,16 +105,12 @@ def delete_columns(file_path: str, column_names: List[str]) -> str:
     log(f"🗑️ Deleting columns {column_names} from {file_path}")
     try:
         df = pd.read_csv(file_path, encoding='utf-8-sig')
-        
-        # Filter columns that actually exist in the dataframe
         to_drop = [c for c in column_names if c in df.columns]
         
         if not to_drop:
             return "No matching columns found to delete."
             
         df.drop(columns=to_drop, inplace=True)
-        
-        # Clean column names by removing pandas duplicate suffixes (e.g., .1, .2)
         df.columns = df.columns.str.replace(r'\.\d+$', '', regex=True)
 
         df.to_csv(file_path, index=False, encoding='utf-8-sig')
@@ -154,18 +140,8 @@ def delete_rows_by_values(file_path: str, column_index: int, values_to_delete: L
             return f"Column index {column_index} out of bounds"
             
         col_name = df.columns[column_index]
-        
-        # Filter rows
         original_count = len(df)
-        
-        # Convert column and values to string for comparison to be safe, or keep as is?
-        # Let's try to match types if possible, but string comparison is safest for mixed types in CSVs.
-        # We'll convert both to string for the mask.
-        
-        # Normalize values to delete to strings
         values_str = [str(v) for v in values_to_delete]
-        
-        # Create mask: True if value is in the list
         mask = df[col_name].astype(str).isin(values_str)
         
         df_clean = df[~mask]
@@ -194,7 +170,6 @@ def get_unique_column_values(file_path: str, column_index: int) -> List[Any]:
     try:
         df = pd.read_csv(file_path, usecols=[column_index], encoding='utf-8-sig')
         unique_values = df.iloc[:, 0].unique().tolist()
-        # Filter out NaNs if desired, or keep them to let agent decide
         return [x for x in unique_values if pd.notnull(x)]
     except Exception as e:
         return [f"Error reading column: {str(e)}"]
@@ -278,18 +253,11 @@ def normalize_csv_columns(file_path: str) -> str:
         
         original_columns = df.columns.tolist()
         new_columns = [normalize_feature_name(col) for col in original_columns]
-        
-        # Check if any changes are needed
         if original_columns == new_columns:
             return "All columns are already normalized."
             
         df.columns = new_columns
-        
-        # Handle duplicates if normalization created them
-        # e.g. "Col A" and "Col_A" might both become "col_a"
-        # Pandas handles this by not allowing duplicates easily, but let's ensure uniqueness
         if len(set(new_columns)) != len(new_columns):
-            # Simple deduplication strategy
             counts = {}
             deduped_columns = []
             for col in new_columns:

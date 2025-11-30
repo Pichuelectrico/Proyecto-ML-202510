@@ -1,6 +1,6 @@
 import os
 from agents import Agent, Runner, function_tool
-from tools.shared import report_agent_start, print_header
+from tools.shared import print_header, report_agent_completion
 from tools.shared import log
 from tools.formats.pdf import (
     extract_text_from_pdf,
@@ -11,6 +11,7 @@ from tools.formats.pdf import (
 from custom_agents.consolidator.extractors.pdf.pdf_cleaner import pdf_cleaner
 
 NAME = "Pdf Extractor"
+TITLE = f"[5/7] {NAME}"
 
 pdf_extractor = Agent(
     name=NAME,
@@ -33,6 +34,9 @@ pdf_extractor = Agent(
     4. LIMPIEZA FINAL (OBLIGATORIO):
        - Llama al agente `clean_csvs` pasando la ruta COMPLETA del archivo CSV generado (ej: `data/preprocessed/riesgo_2025.csv`) y el `target_segment` si se te proporcionó.
        - Esto estandarizará las columnas y filtrará filas si es necesario.
+
+    5. FINALIZACIÓN (OBLIGATORIO):
+       - Llama a `report_agent_completion` pasando title="{TITLE}" y todo tu output.
     
     El usuario te proporcionará el nombre del archivo de salida y opcionalmente el `target_segment` en el prompt.
     """,
@@ -44,7 +48,8 @@ pdf_extractor = Agent(
             tool_name="clean_csvs",
             tool_description="Limpia y estandariza un archivo CSV específico, filtrando por segmento si es necesario.",
             max_turns=15
-        )
+        ),
+        report_agent_completion,
     ]
 )
 
@@ -58,7 +63,7 @@ async def process_pdf(file_path: str, output_filename: str, target_segment: str 
         output_filename: Nombre del archivo CSV de salida (ej: 'riesgo_junio_2025.csv').
         target_segment: (Opcional) Segmento específico a filtrar (ej: "1").
     """
-    print_header(title=f"[5/7] {NAME}", description="Extracción de tablas de PDF")
+    print_header(title=TITLE, description="Extracción de tablas de PDF")
     log(f"📄 Procesando PDF: {file_path} (Segmento: {target_segment})")
     
     if not os.path.exists(file_path):
@@ -72,8 +77,8 @@ async def process_pdf(file_path: str, output_filename: str, target_segment: str 
             prompt += f" Finalmente, usa clean_csvs pasando el archivo 'data/preprocessed/{output_filename}' y target_segment='{target_segment}'."
         else:
             prompt += f" Finalmente, usa clean_csvs pasando el archivo 'data/preprocessed/{output_filename}'."
-
-        # Mensaje inicial con el archivo y la instrucción
+        
+        prompt += " Al finalizar todo, llama a report_agent_completion."
         messages = [
             {
                 "role": "user",
@@ -90,8 +95,6 @@ async def process_pdf(file_path: str, output_filename: str, target_segment: str 
                 "content": prompt
             }
         ]
-        
-        # Ejecutar el agente
         result = await Runner.run(
             starting_agent=pdf_extractor,
             input=messages,
