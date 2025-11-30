@@ -15,7 +15,7 @@ async def main():
     objetivo = "Segmento 1, fecha más reciente"
     print(f"🎯 Objetivo: {objetivo}")
 
-    skip_scraper = True
+    skip_scraper = False
 
     if not skip_scraper:
         result_scraper = await Runner.run(

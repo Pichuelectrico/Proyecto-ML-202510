@@ -75,7 +75,7 @@ TU MISION:
         - Si no encuentras estructura válida, descarta la hoja.
 
      b) EXTRACCIÓN INCREMENTAL DE FEATURES:
-        - Define el archivo temporal para esta hoja: `data/preprocessed/temp/{nombre_hoja}.csv`.
+        - Define el archivo temporal para esta hoja: `data/preprocessed/temp/[nombre_hoja].csv`.
         - Itera leyendo batches de filas hacia abajo (ej: de 200 en 200) desde `fila_inicial` en la `columna_inicial`.
         - En cada batch:
           1. Identifica los índices de las filas que contienen features RELEVANTES según los criterios arriba.
