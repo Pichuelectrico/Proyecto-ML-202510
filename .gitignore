@@ -47,5 +47,7 @@ playwright/.cache/
 notes/
 
 # Data
-data/raw/
 data/preprocessed/
+
+# Logs
+src/agents_log.txt

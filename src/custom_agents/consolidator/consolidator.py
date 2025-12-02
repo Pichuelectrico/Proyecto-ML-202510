@@ -9,6 +9,7 @@ from tools.transform.dataset import (
 )
 from tools.formats.csv import get_csv_columns_headers
 from tools.utils.datetime import get_current_date
+from tools.github.push import push_to_public_repo
 
 NAME = "Consolidator"
 TITLE = f"[7/7] {NAME}"
@@ -58,13 +59,18 @@ TU MISION:
      - Eliminar duplicados.
      - Normalizar features (StandardScaler), respetando las columnas 'cooperativa', 'abreviacion' y 'Label'.
 
-7. FINALIZACIÓN (OBLIGATORIO):
+7. PUBLICACIÓN (OBLIGATORIO):
+   - Una vez finalizado y limpiado el dataset, llama a `push_to_public_repo`.
+   - Pásale la ruta del dataset generado (`data/processed/dataset.csv`).
+   - Esto subirá automáticamente la versión más reciente a GitHub.
+
+8. FINALIZACIÓN (OBLIGATORIO):
     - Llama a `report_agent_completion` pasando title="{TITLE}" y todo tu output.
 
 CRITICO:
 - El `index_mapping` debe tener la misma longitud que el número de filas del dataset final.
 - Asegúrate de alinear correctamente los nombres.
-- NO OLVIDES el paso 6. Es crucial para la calidad del modelo ML.
+- NO OLVIDES el paso 6 y 7. Son cruciales para la calidad del modelo ML y la persistencia de datos.
 """,
     tools=[
         report_agent_start,
@@ -75,6 +81,7 @@ CRITICO:
         get_csv_columns_headers,
         get_current_date,
         finalize_and_clean_dataset,
+        push_to_public_repo,
         report_agent_completion,
     ],
 )

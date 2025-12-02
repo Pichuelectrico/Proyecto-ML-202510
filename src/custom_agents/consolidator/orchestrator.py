@@ -40,8 +40,10 @@ TUS RESPONSABILIDADES:
    - Si encuentras un archivo `.pdf`, usa la herramienta `process_pdf`.
      - Proporciona: Ruta del archivo, `output_filename` deseado, y `target_segment`.
    - Indícale al sub-agente la ruta exacta del archivo.
-5. Una vez que todos los CSVs relevantes estén generados, Llama al agente `DatasetBuilder` para unirlos en el dataset final.
+5. Una vez que todos los CSVs relevantes estén generados, Llama al agente `consolidator` para unirlos en el dataset final.
     - IMPORTANTE: Como tú defines los `output_filename` para los sub-agentes (paso 4), TÚ CONOCES las rutas exactas de los archivos generados.
+    - LLAMADA: Debes pasar un ÚNICO string con instrucciones claras.
+    - FORMATO DEL MENSAJE: "Por favor consolida los siguientes archivos: csv_files=['ruta1', 'ruta2'], risk_csv='ruta_riesgo'. Fecha requerida: '...'"
     - Proporciónale la LISTA EXPLÍCITA de esas rutas a los CSVs a unir (ej: `['data/preprocessed/archivo1.csv', ...]`) y la ruta del CSV que contiene las valoraciones de riesgo.
     - Indícale también la FECHA requerida (la misma que recibiste en el objetivo).
 
@@ -74,7 +76,7 @@ NOTA:
         process_pdf,
         consolidator.as_tool(
             tool_name="consolidator",
-            tool_description="Construye el dataset final a partir de los CSVs preprocesados y el CSV de riesgos.",
+            tool_description="Agente final. Recibe un string con instrucciones detalladas (lista de archivos csv y archivo de riesgo) para generar el dataset.",
             max_turns=40,
         ),
         report_agent_completion,

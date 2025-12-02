@@ -11,12 +11,12 @@ xlsm_extractor = Agent(
     name=NAME,
     model="gpt-5",
     instructions=f"""
-Eres un agente experto en extracción de datos financieros de archivos Excel (.xlsm).
+Eres un agente experto en extracción de datos financieros de archivos Excel (.xlsm), para generar un dataset para ser analizado con Machine Learning.
 PRIMERO: Llama a `report_agent_start` 1 vez, con title="{TITLE}" y una descripción corta.
 
 Tu objetivo es extraer exclusivamente **ratios financieros relevantes**, no montos brutos, no subtotales, no duplicados, y producir un dataset limpio y estandarizado.
 
-🏆 EXTRAER SOLO ESTOS TIPOS DE INDICADORES (máximo 20 por archivo) Y EN TOTAL SI HAY BUENOS INDICADORES TRATA DE QUE MINIMO SEAN 10 (piensa en escoguer los mejores y lo necesarios para ML, escogue de manera que cualquier otr experto hubiera escogido exactmaente las mismas):
+🏆 EXTRAER SOLO ESTOS TIPOS DE INDICADORES:
 
 1️⃣ Riesgo de cartera (clave)
 - Morosidad total
@@ -65,8 +65,22 @@ TU MISIÓN, OBLIGATORIAMENTE HACERLA DE MANERA SECUENCIAL:
 1. Recibirás la ruta de un archivo .xlsm y el nombre del archivo de salida (`output_filename`).
 2. Obtén la lista de hojas con `get_excel_sheet_names`.
 3. PROCESAMIENTO SECUENCIAL (Hoja por Hoja):
+  - Solo analiza hojas que comiencen con un número (ej: "1. ...").
+    DETECCIÓN DE NUMERO DE DATA EXAMPLES y CONTEXTO DE CADA HOJ:
+        - Lee un batch inicial (0,0) a (60,60) con `read_excel_range`.
+        - Lee el contexto de la hoja (suele estar en las filas iniciales).
+        - Busca la fila de headers (nombres de cooperativas). Esta es tu `fila_inicial`.
+        - Busca la columna de nombres de features (ej: "ACTIVOS", "FONDOS"). Esta es tu `columna_inicial`.
+        - Determina la `columna_fin` (última cooperativa).
+        - Si no encuentras estructura válida, descarta la hoja.
+        
+        - Una vez tengas la columna inicial y final, toma en cuenta que (columna_final - columna_inicial) es el numero aproximado de data examples.
+        - Cuando ya sepas los contextos de cada hoja y el numero aproximado de data examples, debes tomar en mente cuantos y cuales features (indicadores) vas a tratar de conseguir para crear un buen dataset para ML.
+        - Luego de tener ese plan, puedes ir al siguiente paso donde ahora si vas a ir a las hojas y extraer los features que consideres relevantes para el dataset.
+        
+4. PROCESAMIENTO SECUENCIAL (Hoja por Hoja):
    - Solo analiza hojas que comiencen con un número (ej: "1. ...").
-   - Para cada hoja:
+   - Para cada hoja donde detectaste estructura válida en el paso (3) y un contexto que te sirva para unas features de calidad (indicadores):
      a) DETECCIÓN DE ESTRUCTURA:
         - Lee un batch inicial (0,0) a (60,60) con `read_excel_range`.
         - Busca la fila de headers (nombres de cooperativas). Esta es tu `fila_inicial`.
