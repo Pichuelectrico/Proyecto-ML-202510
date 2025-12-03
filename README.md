@@ -135,10 +135,8 @@ src/
   custom_agents/
   tools/
   main.py
-figures/        (si aplica)
 README.md
 requirements.txt
-LICENSE         (opcional)
 ```
 
 ---
