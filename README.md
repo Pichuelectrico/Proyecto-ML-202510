@@ -217,7 +217,6 @@ python src/main.py
 
 - Fijar semillas aleatorias en todos los componentes utilizados.
 - Documentar versiones de librerías en `requirements.txt`.
-- Guardar artefactos de resultados y figuras bajo `figures/` (si aplica).
 
 ---
 
@@ -229,9 +228,4 @@ python src/main.py
 - **Base de datos procesada** (`.csv` o `.xlsx`) en `/data/processed` generada por el pipeline.
 - **Notebook ejecutable** como informe principal, con análisis, resultados y conclusiones.
 
----
-
-## Licencia
-
-Este proyecto puede incluir una licencia a elección en `LICENSE` (opcional).
 
